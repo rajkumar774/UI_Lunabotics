@@ -1,0 +1,35 @@
+# Application Configuration
+app:
+  name: "Rover Mission Control"
+  version: "0.1.0"
+  # Legacy switch kept for back-compat. comms.backend takes precedence when set
+  # to anything other than "auto".
+  mock_mode: false
+  log_level: "INFO"
+
+comms:
+  # auto — use ROS 2 when rclpy imports and app.mock_mode is false, else mock.
+  # mock — always MockCommsClient (no ROS 2 traffic).
+  # ros2 — always ROS2CommsClient; fails loudly if rclpy is unavailable.
+  backend: "ros2"
+
+ui:
+  window_title: "Rover Mission Control — Competition Operator Interface"
+  default_width: 1440
+  default_height: 900
+  min_width: 1100
+  min_height: 700
+  theme: "dark"
+  fps_limit: 30
+
+telemetry:
+  mock_rate_hz: 20        # Mock telemetry publish rate (MOCK DATA ONLY)
+  ros_publish_rate_hz: 20 # Rate the ROS 2 client aggregates topics into packets
+  ui_refresh_fps: 30      # Max telemetry widget repaint rate, independent of publish rate
+  stale_timeout_ms: 2000  # Telemetry older than this is shown as STALE
+
+mission:
+  competition_name: "Lunabotics Competition"
+  run_duration_seconds: 1500  # 25 minutes (Guidebook v3, 15 Oct 2026, section 1.3)
+  teleoperation_timeout_ms: 500  # Dead-man's switch threshold
+  heartbeat_timeout_ms: 1000     # Watchdog timeout for rover disconnection

@@ -1,0 +1,215 @@
+# Rover Hardware & Network Configuration
+rover:
+  name: "Lunabotics Rover"
+  computer: "NVIDIA Jetson Orin Nano"
+  os: "Ubuntu 22.04 LTS"
+  ros_distro: "Humble"
+  # Must match ROS_DOMAIN_ID on the Jetson. Mission Control exports this at
+  # startup so the operator laptop and the rover share one DDS domain.
+  ros_domain_id: 17
+
+network:
+  rover_ip: "192.168.2.20"
+  mission_control_ip: "192.168.2.50"
+  heartbeat_port: 8765
+  video_rtsp_port: 8554
+
+# SSH session used by the in-UI Jetson terminal. Topic data does NOT flow
+# through here — this is only for running shell commands on the rover.
+jetson_ssh:
+  enabled: true
+  host: "192.168.2.20"    # Blank falls back to network.rover_ip
+  port: 22
+  username: "agazhvan2"
+  key_path: "~/.ssh/id_ed25519"   # Blank uses the ssh-agent, then password auth
+  # Sourced in the login shell of every session so `ros2` is on PATH.
+  startup_commands:
+    - "source /opt/ros/humble/setup.bash"
+  connect_timeout_s: 8
+  keepalive_s: 15
+  # Watch for the Jetson booting and attach by itself, then re-attach if the
+  # link drops. The header JETSON badge reads WAITING while it watches.
+  auto_connect: true
+  reconnect_interval_s: 5
+  # Clear each new shell once its startup commands have run.
+  clear_on_open: true
+  # One-click commands offered above the terminal prompt.
+  quick_commands:
+    - label: "TOPIC LIST"
+      command: "ros2 topic list"
+    - label: "NODE LIST"
+      command: "ros2 node list"
+    - label: "HEARTBEAT HZ"
+      command: "ros2 topic hz /rover/heartbeat"
+    - label: "BRINGUP"
+      command: "ros2 launch rover_bringup rover.launch.py"
+    - label: "CAMERAS"
+      command: "ros2 launch rover_bringup camera.launch.py"
+    - label: "JTOP"
+      command: "jtop"
+
+# ------------------------------------------------------------------------
+# MISSION ACTION BINDINGS  <<< THIS IS WHERE YOUR REAL COMMANDS GO >>>
+#
+# Each operator button looks itself up here. Today every entry is `mock`,
+# so the buttons work end-to-end and log what they would have done without
+# commanding anything.
+#
+# When a Jetson launch file / action server is ready, change that entry's
+# `mode` and fill in the matching field. Nothing in the UI code changes.
+#
+#   mode: mock     -> acknowledge locally, command nothing
+#   mode: ssh      -> run `command` in the Jetson terminal  (WORKS TODAY)
+#   mode: topic    -> publish `payload` as std_msgs/String on `topic`
+#   mode: service  -> call lunabot_msgs/LaunchSystem on `service`
+#   mode: action   -> send a goal to the action server at `action`
+#
+# `ssh` is the bridge: it needs nothing on the Jetson beyond sshd, because
+# running a launch file IS a shell command. Move to `service` later for
+# structured success/failure and clean process-group shutdown.
+# ------------------------------------------------------------------------
+mission_actions:
+  # --- SYSTEMS: (empty) --------------------------------------------------
+  #
+  # LOCALIZATION was removed as a button: full_autonomy.launch.py already
+  # pulls it in (full_autonomy -> traverse -> rover_localization), so pressing
+  # both would start the sensor stack twice and fight over /dev/video0.
+  #
+  # --- SYSTEMS bring-up notes (kept for when a button returns) -----------
+  #
+  # HOW EACH ONE SHOULD EVENTUALLY WORK:
+  #   cameras      -> NOT a button. systemd autostart on the Jetson (Tier 1).
+  #                   Video is worth 240 pts across two runs and must survive
+  #                   the E-Stop reboot unaided. The buttons below are RESTART
+  #                   controls for a stream that dies mid-run, nothing more.
+  #   stacks       -> mode: service (LaunchSystem.srv), for a structured
+  #                   result and clean process-group shutdown.
+  #                   mode: ssh is the BRIDGE until that service exists --
+  #                   acceptable only because these are pressed once, during
+  #                   setup, with no deadline at the moment of pressing.
+  #
+  # --- ACTIONS: mission tasks, pressed repeatedly during the run ---------
+  # mode: ssh runs the launch file over the live terminal session. That is the
+  # BRIDGE, not the destination: these are pressed repeatedly during a timed
+  # run, where a structured result and a clean process-group shutdown matter.
+  # SSH gives neither -- you know the command was typed, not that the nodes
+  # came up. Switch each to mode: service once LaunchSystem.srv exists.
+  EXCAVATE:
+    mode: ssh
+    command: "ros2 launch excavate_dump excavate_phase.launch.py"
+    topic: "/mission/cmd"
+    payload: "EXCAVATE"
+    service: "/launch_system"
+    action: "/autonomy/excavation"
+  DUMP:
+    mode: ssh
+    command: "ros2 launch excavate_dump dump_phase.launch.py"
+    topic: "/mission/cmd"
+    payload: "DUMP"
+    service: "/launch_system"
+    action: "/autonomy/depositing"
+  ONE CYCLE AUTO:
+    mode: ssh
+    command: "ros2 launch rover_navigation full_autonomy.launch.py"
+    topic: "/mission/cmd"
+    payload: "ONE CYCLE AUTO"
+    service: "/launch_system"
+    action: "/autonomy/full_cycle"
+
+# ------------------------------------------------------------------------
+# VIDEO VIEWERS — run on THIS LAPTOP when START STREAM is pressed.
+#
+# These are RECEIVER pipelines: they connect out to the rover and open their
+# own GStreamer windows. They are not run on the Jetson.
+#
+# The files are read at press time, so you can edit the pipelines without
+# restarting Mission Control.
+# ------------------------------------------------------------------------
+video_launch:
+  # OFF on purpose. These external gst-launch viewers connect to the SAME RTSP
+  # media as the in-UI player, and the server serves both from one shared
+  # pipeline (shared=True). Measured: with a viewer running the UI player got
+  # 1 frame in 10 s; with it off, 241 frames (23.5 fps). The viewers were a
+  # workaround from when the UI could not show the streams itself -- now they
+  # only starve it. Set true again only if you need a separate window AND
+  # accept that the in-UI video will stall.
+  enabled: false
+  stop_on_stream_stop: true     # kill the viewers when STOP STREAM is pressed
+  viewers:
+    - name: "D456 FRONT"
+      command_file: "~/frontcamera.txt"
+    - name: "BACK CAM"
+      command_file: "~/backcamera.txt"
+
+ros_topics:
+  cmd_vel: "/cmd_vel"
+  heartbeat: "/rover/heartbeat"
+  # The witmotion IMU, published by rover_localization/imu_modbus_node and
+  # read by ekf.yaml as imu0. There is no /imu/data on this rover.
+  imu: "/witmotion/imu"
+  # Wheel odometry, NOT the fused EKF output. The EKF only runs while the
+  # localization stack is up, so /ekf_odom/odometry would leave MOTION blank
+  # until ONE CYCLE AUTO is pressed; wheel_odom_node runs from boot via
+  # rover-sensors.service. Only the TWIST is read here (speed, turn rate),
+  # which encoders measure directly -- the pose that skid steer makes
+  # untrustworthy is never displayed. Alternatives: /ekf_odom/odometry,
+  # /fastlio/odom_base, both of which need localization running.
+  odometry: "/wheel/odom"
+  # Per-track wheel velocities from wheel_odom_node, names left_track /
+  # right_track (rad/s). There is no /joint_states on this rover.
+  joint_states: "/wheel/encoders"
+  battery: "/battery_state"
+  # Single Livox MID-360 via livox_ros_driver2.
+  lidar: "/livox/lidar"
+  lidar_imu: "/livox/imu"        # MID-360 has a built-in IMU
+  camera_image: "/camera/image_raw"
+  camera_compressed: "/camera/image_raw/compressed"
+  mission_state: "/mission/state"
+  mission_cmd: "/mission/cmd"
+  autonomy_mode: "/mission/autonomy_mode"
+  diagnostics: "/diagnostics"
+  estop: "/safety/estop"
+  joy: "/joy"                          # published by joy_node on THIS laptop
+  teleop_status: "/rover/teleop_status"  # echoed by joy_serial_node on the Jetson
+  # Published by rover_localization/tag_pose_node each time an AprilTag fix is
+  # computed. Its arrival IS the "localized" signal behind the LED in the
+  # stream footer -- a real topic, not a log line scraped from the terminal.
+  tag_pose: "/tag/rover_pose"
+
+sensors:
+  lidar_count: 1
+  lidar_model: "Livox MID-360"
+  camera:
+    mount: "front"
+    aspect_ratio: "16:9"
+    target_fps: 30
+    resolution:
+      width: 1280
+      height: 720
+
+# Two independent video ingest streams. Leave `uri` blank to fall back to the
+# synthetic test pattern, which keeps the player usable with no rover present.
+cameras:
+  # Primary operator view, rendered full size on the left.
+  main:
+    name: "D456 DEPTH CAMERA"
+    uri: "rtspsrc location=rtsp://192.168.2.20:8554/stream latency=0 protocols=tcp ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink"   # e.g. rtsp://192.168.2.20:8554/d456
+    rtsp_transport: "udp"
+    target_fps: 30
+    resolution:
+      width: 640
+      height: 360
+  # Small picture-in-picture inset drawn in the corner of the main stream.
+  pip:
+    name: "FRONT CAM"
+    # Rear OV9281, served from its ROS topic by the rear_stream_bridge. The old
+    # direct-TCP path (port 5000) opened /dev/video0 itself and so could not run
+    # alongside AprilTag localization; both now subscribe to /rear_camera/image_raw.
+    uri: "rtspsrc location=rtsp://192.168.2.20:8555/rear latency=0 protocols=tcp ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink"
+    rtsp_transport: "udp"
+    target_fps: 30
+    corner: "bottom_right"   # top_left | top_right | bottom_left | bottom_right
+    width_fraction: 0.26  # Inset width as a fraction of the 16:9 viewport
+    resolution:
+      width: 640
+      height: 360

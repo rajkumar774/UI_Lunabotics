@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rover-mission-control"
+version = "0.1.0"
+description = "Mission Control application for Lunabotics-style planetary rover"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Rover Mission Control Team" }
+]
+dependencies = [
+    "PySide6>=6.5.0",
+    "PyYAML>=6.0",
+    "numpy>=1.21.0",
+    "opencv-python>=4.8.0",
+    # Jetson terminal: SSH transport and VT100 screen model.
+    "paramiko>=2.9.0",
+    "pyte>=0.8.0",
+]
+
+# rclpy and the ROS 2 message packages are deliberately NOT listed here: they
+# are installed by ROS 2 itself (apt / `source /opt/ros/humble/setup.bash`) and
+# are not available on PyPI. Mission Control imports them lazily and falls back
+# to the mock backend when they are absent.
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[project.scripts]
+mission-control = "mission_control.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v"

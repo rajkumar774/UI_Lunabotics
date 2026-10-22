@@ -1,0 +1,552 @@
+/* ==========================================================================
+   ROVER MISSION CONTROL — MASTER STYLESHEET (Dark Competition Palette)
+   ========================================================================== */
+
+/* Global Window & Base */
+QMainWindow, QWidget#CentralWidget {
+    background-color: #140d11;
+    color: #f7f0f2;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+    font-size: 13px;
+}
+
+/* Header Container */
+QWidget#HeaderBar {
+    background-color: #1d1318;
+    border-bottom: 1px solid #35222a;
+    padding: 8px 16px;
+}
+
+QLabel#AppTitle {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #fdf7f8;
+}
+
+QLabel#AppSubtitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: #e0657f;
+    letter-spacing: 0.8px;
+}
+
+/* Card / Panel Base */
+QFrame.StatusCard {
+    background-color: #1e1419;
+    border: 1px solid #38242d;
+    border-radius: 6px;
+}
+
+QFrame.StatusCard:hover {
+    border-color: #4a2f39;
+}
+
+QLabel#CardHeader {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: #b09aa1;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #2a1a20;
+}
+
+QLabel#CardValue {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f7f0f2;
+}
+
+QLabel#CardSubtext {
+    font-size: 11px;
+    color: #8a7079;
+}
+
+/* Placeholder Frames (Video & Map) */
+QFrame#VideoPlaceholder {
+    background-color: #0d0709;
+    border: 1px dashed #38242d;
+    border-radius: 6px;
+}
+
+QFrame#MapPlaceholder {
+    background-color: #0d0709;
+    border: 1px dashed #38242d;
+    border-radius: 6px;
+}
+
+QLabel#PlaceholderTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #8a7079;
+    letter-spacing: 0.5px;
+}
+
+QLabel#PlaceholderSubtitle {
+    font-size: 12px;
+    color: #6b525a;
+}
+
+/* Badges & Indicators */
+QLabel.Badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+QLabel.BadgeDisconnected {
+    background-color: #2b171a;
+    color: #ff5f5f;
+    border: 1px solid #7f1d1d;
+}
+
+QLabel.BadgeMock {
+    background-color: #2b171e;
+    color: #e0657f;
+    border: 1px solid #6d1628;
+}
+
+QLabel.BadgeConnected {
+    background-color: #122822;
+    color: #34d399;
+    border: 1px solid #065f46;
+}
+
+QLabel.BadgeWarning {
+    background-color: #2b2212;
+    color: #fbbf24;
+    border: 1px solid #78350f;
+}
+
+/* Push Buttons */
+QPushButton {
+    background-color: #2a1a20;
+    color: #f7f0f2;
+    border: 1px solid #4a2f39;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+QPushButton:hover {
+    background-color: #3a242c;
+    border-color: #6b525a;
+}
+
+QPushButton:pressed {
+    background-color: #1f141a;
+}
+
+QPushButton:disabled {
+    background-color: #180f13;
+    color: #6b525a;
+    border-color: #2a1a20;
+}
+
+/* Primary Action Button */
+QPushButton#PrimaryButton {
+    background-color: #8c1f38;
+    border-color: #6d1628;
+    color: #ffffff;
+}
+
+QPushButton#PrimaryButton:hover {
+    background-color: #6d1628;
+}
+
+/* Emergency Stop Button Placeholder */
+QPushButton#EStopButton {
+    background-color: #f01f35;
+    border: 2px solid #ff8a93;
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 8px 18px;
+    border-radius: 4px;
+}
+
+QPushButton#EStopButton:hover {
+    background-color: #ff6b78;
+}
+
+QPushButton#EStopButton:pressed {
+    background-color: #c4162a;
+}
+
+/* Monospace Values for Timers and Diagnostics */
+QLabel.MonoStat {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #e0657f;
+}
+
+/* Scrollbars */
+QScrollBar:vertical {
+    border: none;
+    background: #140d11;
+    width: 8px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #38242d;
+    min-height: 20px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #4a2f39;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* ==========================================================================
+   MISSION CLOCK, PHASE & DEV CONTROLS (Phase 3B)
+   ========================================================================== */
+
+QLabel#MissionClockCaption {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #a1888f;
+}
+
+QLabel#MissionClockCaption[severity="ERROR"] {
+    color: #ff5f5f;
+    font-weight: 800;
+}
+
+/* Deliberately the largest text in the window: readable at a glance */
+QLabel#MissionClockValue {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #f7f0f2;
+    padding: 0px 6px;
+}
+
+QLabel#MissionClockValue[severity="WARNING"] { color: #fbbf24; }
+QLabel#MissionClockValue[severity="ERROR"]   { color: #ff5f5f; }
+
+/* Compact clock controls sitting inline beside the countdown. */
+QPushButton#ClockButton {
+    background-color: #2a1a20;
+    border: 1px solid #4a2f39;
+    border-radius: 4px;
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ddccd2;
+    min-width: 26px;
+}
+
+QPushButton#ClockButton:hover {
+    background-color: #3a242c;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   TELEMETRY PANEL (Phase 3A)
+   Severity is expressed through the dynamic property [severity="..."], set in
+   Python via ui.components.telemetry_primitives.apply_severity(). Severity is
+   always accompanied by explicit text, never signalled by colour alone.
+   ========================================================================== */
+
+QWidget#TelemetryPanel {
+    background-color: transparent;
+}
+
+QFrame#TelemetryCard {
+    background-color: #1a1116;
+    border: 1px solid #38242d;
+    border-radius: 6px;
+}
+
+QFrame#TelemetryCard:hover {
+    border-color: #4a2f39;
+}
+
+QLabel#TelemetryCardTitle {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #a1888f;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #2a1a20;
+}
+
+QLabel#MetricLabel {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    color: #978087;
+}
+
+/* Numeric readings: neutral when nominal, coloured only when off-nominal */
+QLabel#MetricValue {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ebdde1;
+}
+
+QLabel#MetricValue[severity="WARNING"] { color: #fbbf24; }
+QLabel#MetricValue[severity="ERROR"]   { color: #ff5f5f; }
+QLabel#MetricValue[severity="OFFLINE"] { color: #8a7079; }
+QLabel#MetricValue[severity="NO_DATA"] { color: #6b525a; }
+
+/* Headline readings (battery %, speed, roll/pitch, link state) */
+QLabel#MetricValueStrong {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 14px;
+    font-weight: 800;
+    color: #f0e4e8;
+}
+
+QLabel#MetricValueStrong[severity="WARNING"] { color: #fbbf24; }
+QLabel#MetricValueStrong[severity="ERROR"]   { color: #ff5f5f; }
+QLabel#MetricValueStrong[severity="OFFLINE"] { color: #8a7079; }
+QLabel#MetricValueStrong[severity="NO_DATA"] { color: #6b525a; }
+
+/* State words (HEALTHY / LOW / ONLINE / OFFLINE): coloured by condition */
+QLabel#StatusValue {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: #b09aa1;
+}
+
+QLabel#StatusValue[severity="NORMAL"]  { color: #34d399; }
+QLabel#StatusValue[severity="WARNING"] { color: #fbbf24; }
+QLabel#StatusValue[severity="ERROR"]   { color: #ff5f5f; }
+QLabel#StatusValue[severity="OFFLINE"] { color: #8a7079; }
+QLabel#StatusValue[severity="NO_DATA"] { color: #6b525a; }
+
+/* Compact diagnostics footer inside the sensors card */
+QLabel#CardSubtext[severity="NO_DATA"] { color: #6b525a; }
+QLabel#CardSubtext[severity="WARNING"] { color: #fbbf24; }
+QLabel#CardSubtext[severity="ERROR"]   { color: #ff5f5f; }
+
+/* ==========================================================================
+   OPERATOR CONTROL COLUMN (Phase 4)
+   Mode / action buttons, control status, and the Jetson SSH terminal.
+   ========================================================================== */
+
+QWidget#ControlSidebar {
+    background-color: transparent;
+}
+
+QFrame#ControlCard {
+    background-color: #1a1116;
+    border: 1px solid #38242d;
+    border-radius: 6px;
+}
+
+/* --- One-shot mission actions -------------------------------------------- */
+
+QPushButton#ActionButton {
+    background-color: #271820;
+    border: 1px solid #452c38;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #ddccd2;
+}
+
+QPushButton#ActionButton:hover {
+    background-color: #3a242c;
+    border-color: #b5304f;
+    color: #ffffff;
+}
+
+QPushButton#ActionButton:pressed {
+    background-color: #24121a;
+}
+
+QPushButton#ActionButton:disabled {
+    background-color: #170f13;
+    border-color: #2a1a20;
+    color: #574049;
+}
+
+/* Engaged E-Stop inverts to an amber "release" affordance so the latched
+   state is never mistaken for the ready state. */
+QPushButton#EStopButton[engaged="true"] {
+    background-color: #78350f;
+    border: 2px solid #fbbf24;
+    color: #fde68a;
+}
+
+QPushButton#EStopButton[engaged="true"]:hover {
+    background-color: #92400e;
+}
+
+/* --- Jetson terminal ----------------------------------------------------- */
+
+QFrame#TerminalPanel {
+    background-color: #110a0d;
+    border: 1px solid #38242d;
+    border-radius: 6px;
+}
+
+QLabel#TerminalTarget {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8a7079;
+}
+
+QWidget#TerminalView {
+    background-color: #0d0709;
+    border: 1px solid #261820;
+    border-radius: 4px;
+}
+
+QPushButton#TerminalButton {
+    background-color: #271820;
+    border: 1px solid #452c38;
+    border-radius: 3px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ddccd2;
+}
+
+QPushButton#TerminalButton:hover {
+    background-color: #3a242c;
+    color: #ffffff;
+}
+
+QPushButton#TerminalButton:disabled {
+    background-color: #170f13;
+    border-color: #2a1a20;
+    color: #574049;
+}
+
+QPushButton#QuickCommandButton {
+    background-color: #1c1218;
+    border: 1px solid #3a2430;
+    border-radius: 3px;
+    padding: 3px 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #a1888f;
+}
+
+QPushButton#QuickCommandButton:hover {
+    border-color: #b5304f;
+    color: #e0657f;
+}
+
+/* --- Terminal shell tabs ------------------------------------------------- */
+/* A dot prefix on a tab label marks a shell with a command still running, so
+   the operator can see at a glance which shells are free. */
+
+QTabWidget#TerminalTabs::pane {
+    border: 1px solid #261820;
+    border-radius: 4px;
+    top: -1px;
+}
+
+QTabWidget#TerminalTabs QTabBar::tab {
+    background-color: #1c1218;
+    border: 1px solid #3a2430;
+    border-bottom: none;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 3px 10px;
+    margin-right: 2px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #a1888f;
+}
+
+QTabWidget#TerminalTabs QTabBar::tab:selected {
+    background-color: #0d0709;
+    border-color: #b5304f;
+    color: #e0657f;
+}
+
+QTabWidget#TerminalTabs QTabBar::tab:hover {
+    color: #ddccd2;
+}
+
+/* Action block caption while every binding is still a mock. */
+QLabel#TelemetryCardTitle[severity="WARNING"] {
+    color: #fbbf24;
+}
+
+/* Subsystem bring-up buttons (SYSTEMS row). Visually distinct from the
+   one-shot mission ACTIONS below them, because they are pressed once
+   during setup rather than repeatedly during the run. */
+QPushButton#SystemButton {
+    background-color: #24121a;
+    border: 1px solid #5e1b2b;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #f0a6b6;
+}
+
+QPushButton#SystemButton:hover {
+    background-color: #331a23;
+    border-color: #b5304f;
+    color: #fbe4e9;
+}
+
+QPushButton#SystemButton:disabled {
+    background-color: #170f13;
+    border-color: #2a1a20;
+    color: #574049;
+}
+
+/* A SYSTEMS button with no command configured yet. Dimmed and suffixed so
+   it cannot be mistaken for one that actually brings a subsystem up. */
+QPushButton#SystemButton[placeholder="true"] {
+    background-color: #1a1116;
+    border: 1px dashed #4a2f39;
+    color: #8a7079;
+}
+
+QPushButton#SystemButton[placeholder="true"]:hover {
+    border-color: #6b525a;
+    color: #b09aa1;
+}
+
+/* Per-camera stream toggle in the video HUD. Distinct from the main
+   START STREAM button so the two cameras read as independent controls. */
+QPushButton#StreamToggleButton {
+    background-color: #271820;
+    border: 1px solid #452c38;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ddccd2;
+}
+
+QPushButton#StreamToggleButton:hover {
+    background-color: #3a242c;
+    border-color: #b5304f;
+    color: #ffffff;
+}
+
+QPushButton#StreamToggleButton[running="true"] {
+    background-color: #122822;
+    border-color: #065f46;
+    color: #34d399;
+}
