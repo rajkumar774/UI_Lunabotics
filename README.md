@@ -9,7 +9,7 @@ Proud to have contributed to Team AlgoSTEAM's achievement at the NASA Lunabotics
 
 <p align="center">
   <img
-    src="docs/images/nasa-lunabotics-2026.jpg"
+    src="docs/nasa-lunabotics-2026.jpeg"
     alt="Team AlgoSTEAM - NASA Lunabotics 2026 Achievement"
     width="850"
   />
