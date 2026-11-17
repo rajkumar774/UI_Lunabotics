@@ -1,4 +1,34 @@
-<<<<<<< HEAD
+
+---
+
+## 🏆 Achievement & Recognition
+
+### NASA Lunabotics International Championship 2026
+
+Proud to have contributed to Team AlgoSTEAM's achievement at the NASA Lunabotics International Championship 2026, representing India on an international platform.
+
+<p align="center">
+  <img
+    src="docs/images/nasa-lunabotics-2026.jpg"
+    alt="Team AlgoSTEAM - NASA Lunabotics 2026 Achievement"
+    width="850"
+  />
+</p>
+
+<p align="center">
+  <strong>4th Place Globally | 1st Place in India</strong>
+  <br/>
+  🏅 Small and Mighty Award
+</p>
+
+**My Contribution:**
+- Rover Mission Control UI development.
+- ROS 2 communication and integration.
+- Real-time telemetry monitoring.
+- Video streaming and operator interface integration.
+
+---
+
 # Rover Mission Control Application
 
 A competition-grade operator interface for a Lunabotics-style planetary rover.
